@@ -1,0 +1,263 @@
+zfeder - 881354
+
+
+Parser 3.1:
+
+Grammatica 
+
+start⟶ expr EOF
+
+expr⟶ term exprp
+
+exprp⟶ + term exprp | - term exprp | epsilon
+
+term⟶fact termp
+
+termp⟶ * fact termp | / fact termp | epsilon
+
+fact⟶( expr ) | NUM
+
+GUIDE
+
+GUIDA(start⟶ expr EOF) = {(,NUM}
+
+GUIDA(expr⟶ term exprp) = {(,NUM}
+
+GUIDA(exprp⟶ + term exprp) = {+}
+
+GUIDA(exprp⟶ - term exprp) = {-}
+
+GUIDA(exprp⟶ epsilon) = {EOF,)}
+
+GUIDA(term⟶ fact termp) = {(,NUM}
+
+GUIDA(termp⟶ * fact termp) = {*}
+
+GUIDA(termp⟶ / fact termp) = {/}
+
+GUIDA(termp⟶ epsilon) = {EOF,),+,-}
+
+GUIDA(fact⟶ ( expr )) = {(}
+
+GUIDA(fact⟶ NUM) = {NUM}
+
+
+Parser 3.2
+
+Grammatica
+
+prog⟶ statlist EOF
+
+statlist⟶ stat statlistp
+
+statlistp⟶ ; stat statlistp | epsilon
+
+stat⟶ assign expr to idlist | print ( exprlist ) | read ( idlist ) | while ( bexpr ) stat | if ( bexpr ) stat end | if ( bexpr ) stat else stat end | { statlist }
+
+idlist⟶ ID idlistp
+
+idlistp⟶ , ID idlistp | epsilon
+
+bexpr⟶ RELOP expr expr | AND bexpr bexpr | OR bexpr bexpr | NOT bexpr
+
+expr⟶ + ( exprlist ) | - expr expr | * ( exprlist ) | / expr expr | NUM | ID
+
+exprlist⟶ expr exprlistp
+
+exprlistp⟶ , expr exprlistp | epsilon 
+
+GUIDE
+
+GUIDA(prog⟶ statlist EOF) = {assign,print,read,while,if,{ }
+
+GUIDA(statlist⟶ stat statlistp) = {assign,print,read,while,if,{ }
+
+GUIDA(statlistp⟶ ; stat statlistp) = {;}
+
+GUIDA(statlistp⟶ epsilon) = {EOF,} }
+
+GUIDA(stat⟶ assign expr to idlist) = {assign}
+
+GUIDA(stat⟶ print ( exprlist )) = {print}
+
+GUIDA(stat⟶ read ( idlist )) = {read}
+
+GUIDA(stat⟶ while ( bexpr ) stat) = {while}
+
+GUIDA(stat⟶ if ( bexpr ) stat end) = {if}
+
+GUIDA(stat⟶ if ( bexpr ) stat else stat end) = {if}
+
+GUIDA(stat⟶ { statlist }) = { { }
+
+GUIDA(stat⟶ epsilon) ={ } }
+
+GUIDA(idlist⟶ ID idlistp ) = {ID}
+
+GUIDA(idlistp⟶ , ID idlistp) = {,}
+
+GUIDA(idlistp⟶ epsilon) = {EOF, ; ,),end,else,} }
+
+GUIDA(bexpr⟶ RELOP expr expr) = {RELOP}
+
+
+
+
+Valutatore 4.0
+
+SDD
+
+Produzioni              Regole semantiche                     Nota: val=attributo sintetizato
+								                                      i= attributo ereditato
+
+start⟶ expr EOF        expr_val = expr()    
+ 
+expr⟶ term exprp       term_val = term(), exprp_val = exprp(term_val)
+
+exprp⟶ + term exprp    term_val = term(), exprp_val = exprp(exprp_i + term_val);
+
+exprp⟶ - term exprp    term_val = term(), exprp_val = exprp(exprp_i - term_val);
+
+exprp⟶ epsilon         exprp_val = exprp_i
+
+term⟶fact termp	        fact_val = fact(), term_val = termp(fact_val);
+
+termp⟶ * fact termp    fact_val = fact(), termp_val = termp(termp_i * fact_val);
+
+termp⟶ / fact termp    fact_val = fact(), termp_val = termp(termp_i / fact_val);
+
+termp⟶ epsilon         termp_val = termp_i
+
+fact⟶ ( expr )         fact_val= expr()
+
+fact⟶ NUM              fact_val = NUM.value;
+
+
+Traduttore 5.0
+
+SDT
+
+Produzioni                                Azioni semantiche             
+
+prog⟶ statlist EOF                       { lnext_prog = code.newLabel()
+
+                                            || statList(lnext_prog) 
+                                    
+                                            || code.emitLabel(lnext_prog)
+                                    
+                                            || "EOF"} 
+
+statlist⟶ stat statlistp                 { stat(lnext) }{ statListp(lnext) }
+
+statlistp⟶ ; stat statlistp              { ";" || stat(lnext) }{ statListp(lnext) }          
+
+stat⟶ assign expr to idlist              { ASSIGN || expr() } { idlist(false) }
+  
+stat⟶ print ( exprlist )                 { PRINT || "(" || exprList(true,0) || ")" }            
+
+stat⟶ read ( idlist )                    { READ || "(" || idList(true) || ")" } 
+
+stat⟶ while ( bexpr ) stat               { lwhile_start = code.newLabel(),
+                                           
+                                           || lwhile_true = code.newLabel()
+                                           
+                                           || lwhile_out = code.newLabel();
+                                           
+                                           || code.emitLabel(lwhile_start)
+                                           
+                                           || "("
+                                    
+                                           || bexpr(lwhile_true,0,0)
+                                    
+                                           || ")"
+                                            
+                                           || code.emit(OpCode.GOto, lwhile_out) 
+                                    
+                                           || code.emitLabel(lwhile_true)
+                                    
+                                           || stat(lnext)
+                                    
+                                           || code.emit(OpCode.GOto, lwhile_start)
+                                    
+                                           || code.emitLabel(lwhile_out) }
+
+
+stat⟶ if ( bexpr ) stat end             { lif_in = code.newLabel()
+                                   
+                                           || lif_else = code.newLabel()
+                                  
+                                           || lif_end = code.newLabel()
+					
+					                       || "("
+
+                                           || bexpr(lif_in,0,0)
+                                          
+                                           || ")"
+                                          
+                                           || code.emit(OpCode.GOto,lif_else)
+
+                                           || code.emitLabel(lif_in)
+                
+                                           || stat(lnext)
+                
+                                           || code.emit(OpCode.GOto, lif_end)
+                
+                                           || code.emitLabel(lif_else)
+                                          
+                                           || code.emitLabel(lif_end) }
+
+stat⟶ if ( bexpr ) stat else stat end   {  lif_in = code.newLabel()
+                                   
+                                           || lif_else = code.newLabel()
+                                  
+                                           || lif_end = code.newLabel()
+					
+					                       || "("
+
+                                           || bexpr(lif_in,0,0)
+                                          
+                                           || ")"
+                                          
+                                           || code.emit(OpCode.GOto,lif_else)
+
+                                           || code.emitLabel(lif_in)
+                                  
+                                           ||stat(lnext)
+                    
+                                           || code.emit(OpCode.GOto,lif_end) 
+                                           
+                                           || code.emitLabel(lif_end) }
+
+
+stat⟶ { statlist }                       { "{" || statList(lnext) || "}" }
+
+
+idlist⟶ ID idlistp                       { "ID"  || idListp(read) || code.emit(OpCode.istore, read_id_addrr) }
+
+idlistp⟶ , ID idlistp                    { "," || read_id_addrr || code.emit(OpCode.istore, read_id_addrr)
+              
+                                               || code.emit(OpCode.iload,read_id_addrr) }
+
+bexpr⟶ RELOP expr expr                   { RELOAP || expr() }{ expr() }
+
+bexpr⟶ AND bexpr bexpr                   { AND || bexpr(lnext,1,1 }{ bexpr(lnext,1,0) }
+
+bexpr⟶ OR bexpr bexpr                    { OR || bexpr(lnext,0,0) }{ bexpr(lnext,2,0) }
+
+bexpr⟶ NOT bexpr                         { NOT || bexpr(lnext,3,0) }
+
+expr⟶ + ( exprlist )                     { "+" || "(" || exprList(false, 1) || ")"}
+
+expr⟶ - expr expr                        { "-" expr() }{ expr() } 
+
+expr⟶ * ( exprlist )                     { "*" || "(" || exprList(false, 2) || ")"}
+
+expr⟶ / expr expr                        { "/" expr() }{ expr() } 
+
+expr⟶ NUM                                { NUM.value || code.emit(OpCode.ldc, NUM.value) }
+
+expr⟶ ID                                 { read_id_addr || code.emit(OpCode.iload,read_id_addr) }
+
+exprlist⟶ expr exprlistp                 { expr() }{ exprlistp(print,op) }
+
+exprlistp⟶ , expr exprlistp              { "," || expr() || exprlistp(print, op) }  
