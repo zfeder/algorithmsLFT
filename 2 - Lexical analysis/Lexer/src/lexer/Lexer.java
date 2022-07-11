@@ -109,8 +109,7 @@ public class Lexer {
                     peek = ' ';
                     return Word.and;
                 } else {
-                    System.err.println("Erroneous character"
-                            + " after & : "  + peek );
+                    System.err.println("Erroneous character" + " after & : "  + peek );
                     return null;
                 }
 
@@ -231,7 +230,7 @@ public class Lexer {
 
     public static void main(String[] args) {
         Lexer lex = new Lexer();
-        String path = "C:\\Users\\feder\\Desktop\\Laboratorio LFT\\2 - Analisi Lessicale\\Lexer\\src\\lexer\\prova.txt"; // il percorso del file da leggere
+        String path = "C:\\Users\\feder\\Desktop\\Laboratorio LFT\\2 - Analisi Lessicale\\Lexer\\src\\lexer\\input.txt";
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
             Token tok;

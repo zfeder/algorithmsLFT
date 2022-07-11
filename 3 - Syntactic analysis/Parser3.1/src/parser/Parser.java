@@ -14,13 +14,13 @@ public class Parser {
     }
 
     void move() {
-        look = lex.lexical_scan(pbr);
-        System.out.println("token = " + look);
+        look = lex.lexical_scan(pbr); // Si muove token per token
+        System.out.println("token = " + look);  // Stampa il token
     }
 
     void error(String s) {
         throw new Error("near line " + lex.line + ": " + s);
-    }
+    } // Errore
 
     void match(int t) {
         if (look.tag == t) {
@@ -114,7 +114,7 @@ public class Parser {
 
     public static void main(String[] args) {
         Lexer lex = new Lexer();
-        String path = "C:\\Users\\yasya\\OneDrive\\Desktop\\Laboratorio LFT\\3 - Analisi Sintattica\\Parser3.1\\src\\parser\\prova.txt"; // il percorso del file da leggere
+        String path = "C:\\Users\\feder\\Desktop\\Laboratorio LFT\\3 - Analisi Sintattica\\Parser3.1\\src\\parser\\input.txt";
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
             Parser parser = new Parser(lex, br);

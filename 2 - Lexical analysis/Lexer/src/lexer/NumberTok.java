@@ -9,7 +9,8 @@ public class NumberTok extends Token {
     }
 
     public String toString() {
+        // ... completare ...
         return "<" + tag + ", " + n + ">";
     }
-    // ... completare ...
+
 }

@@ -2,8 +2,10 @@ package lexer;
 
 public class Token {
     public final int tag;
-    public Token(int t) { tag = t;  }
-    public String toString() {return "<" + tag + ">";}
+    public Token(int t) {
+        tag = t;  
+    }
+    public String toString() {return "<" + tag + ">";} // Stampa del token
     public static final Token
             not = new Token('!'),
             lpt = new Token('('),

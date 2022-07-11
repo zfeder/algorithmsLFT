@@ -219,7 +219,7 @@ public class Parser {
 
     public static void main(String[] args) {
         Lexer lex = new Lexer();
-        String path = "C:\\Users\\yasya\\OneDrive\\Desktop\\Laboratorio LFT\\3 - Analisi Sintattica\\Parser3.2\\src\\parser\\prova.txt"; // il percorso del file da leggere
+        String path = "C:\\Users\\feder\\Desktop\\Laboratorio LFT\\3 - Analisi Sintattica\\Parser3.2\\src\\parser\\input.txt"; // il percorso del file da leggere
         try {
             BufferedReader br = new BufferedReader(new FileReader(path));
             Parser parser = new Parser(lex, br);

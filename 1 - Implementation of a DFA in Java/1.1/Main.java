@@ -34,6 +34,8 @@ public class Main {
         return state == 1 || state ==2 || state == 3;
     }
     public static void main(String[] args) {
-        System.out.println(scan(args[0]) ? "OK" : "NOPE");
+        System.out.println(scan("010101") ? "NOPE" : "OK");
+        System.out.println(scan("1100011001") ? "NOPE" : "OK");
+        System.out.println(scan("10214") ? "NOPE" : "OK");
     }
 }
